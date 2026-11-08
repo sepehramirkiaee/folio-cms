@@ -17,6 +17,7 @@ this code, so clarity and consistency matter more than cleverness.
 | Dev server               | `npm run dev` (needs Postgres, see README)                  |
 | Lint, format, types      | `npm run lint`, `npm run format:check`, `npm run typecheck` |
 | Unit and component tests | `npm test`                                                  |
+| End-to-end and axe       | `npm run build && npm run test:e2e` (needs Postgres)        |
 | Production build         | `npm run build`                                             |
 | New migration            | `npm run db:migrate -- --name <change>`                     |
 | Seed / reset demo        | `npm run db:seed`, `npm run db:reset-demo`                  |
@@ -97,6 +98,14 @@ scripts/                  operational scripts (seed-if-empty, reset-demo)
 - Everything works with the keyboard and shows a visible focus ring.
 - Text contrast meets WCAG AA in light and dark themes. Respect `prefers-reduced-motion`.
 
+**Testing**
+
+- Unit, component and hook tests live next to the code (`*.test.ts(x)`), use MSW for the
+  network and Testing Library queries by role. See the `write-component-tests` skill.
+- User flows and axe checks live in `e2e/` and run against a production build with a
+  database reset to the seed content. New pages are added to `e2e/accessibility.spec.ts`.
+- A test that needs an arbitrary timeout is a flaky test. Wait for something observable.
+
 **Writing style**
 
 - No em dashes anywhere (code comments, UI copy, docs). Use commas or periods.
@@ -106,3 +115,11 @@ scripts/                  operational scripts (seed-if-empty, reset-demo)
 
 - Small and focused, conventional messages: `feat(scope):`, `fix:`, `test:`, `docs:`, `refactor:`, `build:`, `ci:`, `chore:`.
 - One logical change per commit, with its tests. Never commit failing checks.
+
+## Agent skills
+
+Reusable procedures in `.claude/skills/`. Load the matching one before starting:
+
+- `add-crud-feature`: a new admin content type, end to end.
+- `write-component-tests`: tests for forms, hooks and components.
+- `a11y-review`: the accessibility review every new page or dialog gets before commit.
