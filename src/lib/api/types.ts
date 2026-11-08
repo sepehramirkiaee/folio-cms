@@ -7,6 +7,7 @@ export type ApiErrorCode =
   | "CONFLICT"
   | "DEMO_PROTECTED"
   | "BAD_REQUEST"
+  | "RATE_LIMITED"
   | "INTERNAL";
 
 export type FieldErrors = Record<string, string[] | undefined>;

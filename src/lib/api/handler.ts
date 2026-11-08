@@ -48,19 +48,17 @@ function uniqueFields(error: Prisma.PrismaClientKnownRequestError): string[] {
   return fields?.map((f) => f.replaceAll('"', "")) ?? [];
 }
 
+type Handler<C> = (request: Request, context: C) => Promise<unknown>;
 type AdminHandler<C> = (request: Request, context: C, session: Session) => Promise<unknown>;
 
 /**
- * Wraps an admin route handler: checks the session (proxy.ts is only the first
- * check), turns the return value into `{ data }`, and turns thrown errors into
- * `{ error }` with the right status code.
+ * Turns a handler's return value into `{ data }` (or 204 for undefined), and
+ * thrown errors into `{ error }` with the right status code.
  */
-export function withAdmin<C>(handler: AdminHandler<C>) {
+export function withErrors<C>(handler: Handler<C>) {
   return async (request: Request, context: C): Promise<Response> => {
     try {
-      const session = await getAdminSession();
-      if (!session) throw new ApiError("UNAUTHORIZED", "Sign in to continue");
-      const result = await handler(request, context, session);
+      const result = await handler(request, context);
       if (result instanceof Response) return result;
       if (result === undefined) return new Response(null, { status: 204 });
       return Response.json({ data: result });
@@ -68,6 +66,18 @@ export function withAdmin<C>(handler: AdminHandler<C>) {
       return errorResponse(toApiError(error));
     }
   };
+}
+
+/**
+ * Wraps an admin route handler: checks the session (proxy.ts is only the
+ * first check), then behaves like withErrors.
+ */
+export function withAdmin<C>(handler: AdminHandler<C>) {
+  return withErrors<C>(async (request, context) => {
+    const session = await getAdminSession();
+    if (!session) throw new ApiError("UNAUTHORIZED", "Sign in to continue");
+    return handler(request, context, session);
+  });
 }
 
 /** Parses a JSON body with a Zod schema. Bad JSON is a 400, bad fields a 422. */

@@ -6,6 +6,7 @@ const statusByCode: Record<ApiErrorCode, number> = {
   NOT_FOUND: 404,
   CONFLICT: 409,
   DEMO_PROTECTED: 403,
+  RATE_LIMITED: 429,
   VALIDATION_ERROR: 422,
   INTERNAL: 500,
 };
