@@ -1,4 +1,4 @@
-import { defineConfig } from "prisma/config";
+import type { PrismaConfig } from "prisma/config";
 
 // The Prisma CLI does not read .env files on its own. Node's built-in loader
 // covers local development without adding a dotenv dependency. In Docker and
@@ -9,7 +9,9 @@ try {
   // no .env file
 }
 
-export default defineConfig({
+// A type-only import keeps this file free of runtime dependencies, so the
+// production image can run migrations with a standalone Prisma CLI.
+export default {
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
@@ -18,4 +20,4 @@ export default defineConfig({
   datasource: {
     url: process.env.DATABASE_URL,
   },
-});
+} satisfies PrismaConfig;

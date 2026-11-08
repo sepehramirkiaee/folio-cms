@@ -1,0 +1,24 @@
+# Development override with hot reload, using the same database service.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+#
+# Source is bind-mounted, node_modules stays inside the container.
+
+services:
+  app:
+    build:
+      target: dev
+    environment:
+      NODE_ENV: development
+      # Reliable file watching on macOS and Windows bind mounts.
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    command: >
+      sh -c "npx prisma generate && npx prisma migrate deploy && node prisma/seed.ts &&
+             npm run dev -- --hostname 0.0.0.0"
+    healthcheck:
+      disable: true
