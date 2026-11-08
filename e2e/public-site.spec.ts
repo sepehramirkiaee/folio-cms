@@ -66,6 +66,18 @@ test.describe("public site", () => {
     await expect(status).toBeFocused();
   });
 
+  test("pages fit a 320px wide screen without horizontal scrolling", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 700 });
+    for (const path of ["/", "/projects/checkout-platform-rebuild"]) {
+      await page.goto(path);
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - window.innerWidth,
+      );
+      expect(overflow, path).toBe(0);
+    }
+  });
+
   test("sitemap lists published projects only", async ({ request }) => {
     const xml = await (await request.get("/sitemap.xml")).text();
     expect(xml).toContain("/projects/atlas-design-system");
