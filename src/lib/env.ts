@@ -32,7 +32,9 @@ let cached: ServerEnv | undefined;
 
 export function env(): ServerEnv {
   if (cached) return cached;
-  const parsed = serverEnvSchema.safeParse(process.env);
+  // Treat empty strings as unset, so `ADMIN_EMAIL=` in compose falls back to the default.
+  const raw = Object.fromEntries(Object.entries(process.env).filter(([, v]) => v !== ""));
+  const parsed = serverEnvSchema.safeParse(raw);
   if (!parsed.success) {
     const issues = parsed.error.issues
       .map((i) => `  - ${i.path.join(".")}: ${i.message}`)
