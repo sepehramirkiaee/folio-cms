@@ -2,9 +2,11 @@ import type { Metadata, Viewport } from "next";
 import { ThemeScript } from "@/components/theme/theme-script";
 import { ThemeSync } from "@/components/theme/theme-sync";
 import { Toaster } from "@/components/ui/sonner";
+import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
   title: { default: "folio-cms", template: "%s | folio-cms" },
   description: "A portfolio site with its own admin dashboard.",
 };

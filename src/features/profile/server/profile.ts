@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { getDb } from "@/lib/db";
 import type { Profile, ProfileInput } from "../schemas/profile";
 
@@ -25,12 +26,12 @@ const empty: ProfileInput = {
   avatarUrl: null,
 };
 
-/** The singleton profile, or empty values if it was never created. */
-export async function getProfile(): Promise<Profile> {
+/** The singleton profile, or empty values if it was never created. Cached per request. */
+export const getProfile = cache(async (): Promise<Profile> => {
   const profile = await getDb().profile.findUnique({ where: { id: 1 }, select });
   if (!profile) return { ...empty, updatedAt: new Date(0).toISOString() };
   return { ...profile, updatedAt: profile.updatedAt.toISOString() };
-}
+});
 
 export async function saveProfile(input: ProfileInput): Promise<Profile> {
   const profile = await getDb().profile.upsert({
