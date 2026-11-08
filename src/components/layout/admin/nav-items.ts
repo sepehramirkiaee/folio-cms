@@ -4,6 +4,7 @@ import {
   Inbox,
   LayoutDashboard,
   Sparkles,
+  UserRound,
   type LucideIcon,
 } from "lucide-react";
 
@@ -22,4 +23,5 @@ export const adminNavItems: AdminNavItem[] = [
   { href: "/admin/experience", label: "Experience", icon: Briefcase },
   { href: "/admin/skills", label: "Skills", icon: Sparkles },
   { href: "/admin/inbox", label: "Inbox", icon: Inbox, showUnread: true },
+  { href: "/admin/profile", label: "Profile", icon: UserRound },
 ];
