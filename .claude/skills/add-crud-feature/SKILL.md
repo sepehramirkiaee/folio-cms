@@ -81,11 +81,23 @@ and `await ctx.params`.
 components that set `metadata` and render the feature component. Add the nav
 item in `src/components/layout/admin/nav-items.ts`.
 
+- Small entities with a few fields (skills) edit in a dialog on the list page
+  instead of separate pages.
+- `[id]` pages must read `params` inside a `<Suspense>` boundary (see
+  `projects/[id]/page.tsx`). Cache Components treats params as URL data, and
+  reading it outside a boundary breaks instant navigation.
+- Long forms use `useFormDraft(form, "<name>:<id or new>")` so unsaved input
+  survives a reload, and clear it on a successful save.
+
 ## 8. Tests (same commit as the code they cover)
 
 - Schema tests: valid input, each validation message, empty-string handling.
 - Form test with Testing Library: shows field errors, submits parsed values,
   shows server field errors (mock the mutation with MSW, not by mocking hooks).
+  Render with `renderWithQuery` from `src/test/utils/render.tsx`.
+- Query inputs by role and accessible name. If a query is ambiguous, the UI
+  probably has two controls with the same name, which is an accessibility
+  bug worth fixing rather than working around in the test.
 - Hook test for any optimistic update: success path and rollback on error.
 
 ## 9. Finish
