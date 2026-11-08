@@ -11,3 +11,14 @@ afterEach(() => {
   cleanup();
 });
 afterAll(() => server.close());
+
+// jsdom gaps that Radix primitives (Select, Switch, Dialog) rely on.
+class ResizeObserverStub {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+globalThis.ResizeObserver ??= ResizeObserverStub;
+Element.prototype.scrollIntoView ??= function scrollIntoView() {};
+Element.prototype.hasPointerCapture ??= () => false;
+Element.prototype.releasePointerCapture ??= () => {};
