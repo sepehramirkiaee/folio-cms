@@ -1,4 +1,4 @@
-import { FolderKanban, LayoutDashboard, Sparkles, type LucideIcon } from "lucide-react";
+import { Briefcase, FolderKanban, LayoutDashboard, Sparkles, type LucideIcon } from "lucide-react";
 
 export type AdminNavItem = { href: string; label: string; icon: LucideIcon };
 
@@ -6,5 +6,6 @@ export type AdminNavItem = { href: string; label: string; icon: LucideIcon };
 export const adminNavItems: AdminNavItem[] = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/projects", label: "Projects", icon: FolderKanban },
+  { href: "/admin/experience", label: "Experience", icon: Briefcase },
   { href: "/admin/skills", label: "Skills", icon: Sparkles },
 ];
