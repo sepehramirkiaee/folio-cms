@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
+import { DemoBanner } from "@/components/demo/demo-banner";
 import { SiteFooter } from "@/components/layout/public/site-footer";
 import { SiteHeader } from "@/components/layout/public/site-header";
 import { getProfile } from "@/features/profile/server/profile";
@@ -22,6 +23,7 @@ export default function PublicLayout({ children }: LayoutProps<"/">) {
       >
         Skip to content
       </a>
+      <DemoBanner />
       <SiteHeader />
       <main id="main" tabIndex={-1} className="flex-1 outline-none">
         {children}

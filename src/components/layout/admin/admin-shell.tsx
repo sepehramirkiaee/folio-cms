@@ -10,9 +10,9 @@ import { cn } from "@/lib/utils";
 import { useUiStore } from "@/stores/ui-store";
 import { AdminNav } from "./admin-nav";
 
-type AdminShellProps = { userMenu: ReactNode; children: ReactNode };
+type AdminShellProps = { userMenu: ReactNode; banner?: ReactNode; children: ReactNode };
 
-export function AdminShell({ userMenu, children }: AdminShellProps) {
+export function AdminShell({ userMenu, banner, children }: AdminShellProps) {
   const collapsed = useUiStore((s) => s.sidebarCollapsed);
   const toggleSidebar = useUiStore((s) => s.toggleSidebar);
   const mobileNavOpen = useUiStore((s) => s.mobileNavOpen);
@@ -61,6 +61,7 @@ export function AdminShell({ userMenu, children }: AdminShellProps) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
+        {banner}
         <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80">
           <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
             <SheetTrigger asChild>

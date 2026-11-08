@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { DemoBanner } from "@/components/demo/demo-banner";
 import { AdminShell } from "@/components/layout/admin/admin-shell";
 import { UserMenu } from "@/components/layout/admin/user-menu";
 import { QueryProvider } from "@/components/providers/query-provider";
@@ -26,6 +27,7 @@ export default function ProtectedAdminLayout({ children }: LayoutProps<"/admin">
   return (
     <QueryProvider>
       <AdminShell
+        banner={<DemoBanner />}
         userMenu={
           <Suspense fallback={<Skeleton className="size-9 rounded-md" />}>
             <SessionUserMenu />
