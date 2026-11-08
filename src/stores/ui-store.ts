@@ -10,9 +10,11 @@ type UiState = {
   theme: ThemePreference;
   sidebarCollapsed: boolean;
   mobileNavOpen: boolean;
+  projectsTab: "list" | "order";
   setTheme: (theme: ThemePreference) => void;
   toggleSidebar: () => void;
   setMobileNavOpen: (open: boolean) => void;
+  setProjectsTab: (tab: "list" | "order") => void;
 };
 
 /**
@@ -25,14 +27,20 @@ export const useUiStore = create<UiState>()(
       theme: "system",
       sidebarCollapsed: false,
       mobileNavOpen: false,
+      projectsTab: "list",
       setTheme: (theme) => set({ theme }),
       toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
       setMobileNavOpen: (mobileNavOpen) => set({ mobileNavOpen }),
+      setProjectsTab: (projectsTab) => set({ projectsTab }),
     }),
     {
       name: UI_STORE_KEY,
       storage: createJSONStorage(() => localStorage),
-      partialize: (s) => ({ theme: s.theme, sidebarCollapsed: s.sidebarCollapsed }),
+      partialize: (s) => ({
+        theme: s.theme,
+        sidebarCollapsed: s.sidebarCollapsed,
+        projectsTab: s.projectsTab,
+      }),
     },
   ),
 );
