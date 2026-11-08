@@ -5,6 +5,7 @@ import { ApiError } from "@/lib/api/errors";
 import { paginate } from "@/lib/api/list-params";
 import { assertSkillsExist } from "@/features/skills/server/skills";
 import { getDb } from "@/lib/db";
+import { assertDemoCapacity } from "@/lib/demo";
 import type {
   ExperienceDetail,
   ExperienceInput,
@@ -104,6 +105,7 @@ export async function getExperience(id: string): Promise<ExperienceDetail> {
 }
 
 export async function createExperience(input: ExperienceInput): Promise<ExperienceDetail> {
+  await assertDemoCapacity("experience");
   await assertSkillsExist(input.skillIds);
   const entry = await getDb().experience.create({
     data: { ...toData(input), skills: { connect: input.skillIds.map((id) => ({ id })) } },

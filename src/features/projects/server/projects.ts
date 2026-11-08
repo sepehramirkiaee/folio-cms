@@ -5,6 +5,7 @@ import { ApiError } from "@/lib/api/errors";
 import { paginate } from "@/lib/api/list-params";
 import { assertSkillsExist } from "@/features/skills/server/skills";
 import { getDb } from "@/lib/db";
+import { assertDemoCapacity } from "@/lib/demo";
 import { slugify } from "@/lib/slug";
 import type {
   ProjectDetail,
@@ -112,6 +113,7 @@ export async function getProject(id: string): Promise<ProjectDetail> {
 }
 
 export async function createProject(input: ProjectInput): Promise<ProjectDetail> {
+  await assertDemoCapacity("project");
   const { skillIds, ...fields } = input;
   await assertSkillsExist(skillIds);
   const db = getDb();

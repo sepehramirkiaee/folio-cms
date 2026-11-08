@@ -3,6 +3,7 @@ import type { Prisma } from "@/generated/prisma/client";
 import { ApiError } from "@/lib/api/errors";
 import { paginate } from "@/lib/api/list-params";
 import { getDb } from "@/lib/db";
+import { assertDemoCapacity } from "@/lib/demo";
 import { slugify } from "@/lib/slug";
 import type { SkillInput, SkillOption, SkillRow } from "../schemas/skill";
 import type { skillListParamsSchema } from "../schemas/skill";
@@ -64,6 +65,7 @@ export async function getSkill(id: string): Promise<SkillRow> {
 }
 
 export async function createSkill(input: SkillInput): Promise<SkillRow> {
+  await assertDemoCapacity("skill");
   return withNameConflict(async () =>
     toRow(await getDb().skill.create({ data: { ...input, slug: slugify(input.name) }, select })),
   );
