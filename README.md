@@ -6,8 +6,8 @@ The public site is server-rendered from PostgreSQL for speed and SEO. The
 admin is a protected dashboard for projects, experience, skills and contact
 messages. The whole stack starts with one Docker command.
 
-> Status: Phase 1 of 4 (foundation). Admin features land in Phase 2, the
-> public site and demo mode in Phase 3. See [Roadmap](#roadmap).
+> Status: Phase 2 of 4. The admin is complete; the public site and demo mode
+> land in Phase 3. See [Roadmap](#roadmap).
 
 ## Run locally with Docker
 
@@ -124,7 +124,7 @@ A few choices worth explaining:
 ## Roadmap
 
 - [x] Phase 1: tooling, CI, Docker, database schema and seed, admin login
-- [ ] Phase 2: admin CRUD for projects, experience and skills, reorder, inbox, dashboard
+- [x] Phase 2: admin CRUD for projects, experience and skills, reorder, inbox, dashboard
 - [ ] Phase 3: public site, contact form, demo mode
 - [ ] Phase 4: e2e and accessibility tests, docs polish
 
