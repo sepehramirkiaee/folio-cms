@@ -8,6 +8,7 @@ import { emptyToNull, InputField, TextareaField } from "@/components/form/form-f
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { apiFetch } from "@/lib/api/client";
 import { applyServerErrors } from "@/lib/forms/apply-server-errors";
 import { contactSchema, type ContactInput } from "../schemas/contact";
@@ -22,6 +23,7 @@ export function ContactForm({ demoNotice }: { demoNotice?: boolean }) {
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [error, setError] = useState<string>();
   const sentRef = useRef<HTMLDivElement>(null);
+  const hydrated = useHydrated();
   const form = useForm<ContactInput>({
     resolver: zodResolver(contactSchema),
     defaultValues: empty,
@@ -66,7 +68,7 @@ export function ContactForm({ demoNotice }: { demoNotice?: boolean }) {
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="max-w-xl">
+    <form method="post" onSubmit={onSubmit} noValidate className="max-w-xl">
       <FieldGroup>
         {demoNotice && (
           <p className="text-sm text-muted-foreground">
@@ -120,7 +122,7 @@ export function ContactForm({ demoNotice }: { demoNotice?: boolean }) {
           />
         </div>
         <div>
-          <Button type="submit" disabled={status === "sending"}>
+          <Button type="submit" disabled={!hydrated || status === "sending"}>
             {status === "sending" && <Loader2 className="animate-spin" aria-hidden />}
             Send message
           </Button>

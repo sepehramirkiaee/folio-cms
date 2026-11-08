@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { loginSchema, type LoginInput } from "../schemas/login";
 import { loginAction } from "../server/actions";
 
@@ -21,6 +22,7 @@ export function LoginForm({ defaultValues }: LoginFormProps) {
   const searchParams = useSearchParams();
   const [serverError, setServerError] = useState<string>();
   const [pending, startTransition] = useTransition();
+  const hydrated = useHydrated();
 
   const {
     register,
@@ -40,7 +42,13 @@ export function LoginForm({ defaultValues }: LoginFormProps) {
   });
 
   return (
-    <form onSubmit={onSubmit} noValidate aria-describedby={serverError ? "login-error" : undefined}>
+    // method="post" keeps credentials out of the URL if a native submit ever happens.
+    <form
+      method="post"
+      onSubmit={onSubmit}
+      noValidate
+      aria-describedby={serverError ? "login-error" : undefined}
+    >
       <FieldGroup>
         {serverError && (
           <Alert variant="destructive" id="login-error">
@@ -75,7 +83,7 @@ export function LoginForm({ defaultValues }: LoginFormProps) {
           <FieldError id="password-error" errors={[errors.password]} />
         </Field>
 
-        <Button type="submit" disabled={pending} className="w-full">
+        <Button type="submit" disabled={!hydrated || pending} className="w-full">
           {pending && <Loader2 className="animate-spin" aria-hidden />}
           {pending ? "Signing in..." : "Sign in"}
         </Button>

@@ -6,6 +6,8 @@ test.describe("admin access", () => {
   test("signed-out visitors are sent to the login page and back after sign in", async ({
     page,
   }) => {
+    const urls: string[] = [];
+    page.on("request", (r) => urls.push(r.url()));
     await page.goto("/admin/inbox");
     await expect(page).toHaveURL(/\/admin\/login\?callbackUrl=/);
 
@@ -20,6 +22,8 @@ test.describe("admin access", () => {
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page).toHaveURL("/admin/inbox");
     await expect(page.getByRole("heading", { name: "Inbox" })).toBeVisible();
+    // Credentials must never end up in a URL (history, logs, referrers).
+    expect(urls.filter((u) => u.includes("password"))).toEqual([]);
   });
 
   test("the admin API rejects requests without a session", async ({ request }) => {
