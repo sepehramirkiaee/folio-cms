@@ -83,6 +83,58 @@ jobs:
       - name: Seed runs on the migrated database
         run: npm run db:seed
 
+  e2e:
+    name: End-to-end and accessibility tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: folio
+          POSTGRES_PASSWORD: folio
+          POSTGRES_DB: folio
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U folio"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://folio:folio@localhost:5432/folio
+      AUTH_SECRET: ci-only-secret-not-used-anywhere-else-0123456789
+      AUTH_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Apply migrations
+        run: npx prisma migrate deploy
+
+      - name: Build
+        run: npm run build
+
+      # Starts the production server, resets the database to the seed content,
+      # then runs the user flows and the axe checks in light and dark mode.
+      - name: Run Playwright
+        run: npm run test:e2e
+
+      - name: Upload the Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7
+
   docker:
     name: Docker smoke test
     runs-on: ubuntu-latest
