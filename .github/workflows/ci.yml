@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: 1
+
+jobs:
+  quality:
+    name: Lint, types, tests, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # postinstall runs `prisma generate`
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format
+        run: npm run format:check
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Unit and component tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  docker:
+    name: Docker smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # The same command the README promises, from a clean state.
+      - name: Start the stack
+        run: docker compose up --build --detach --wait --wait-timeout 180
+
+      - name: Check health, public page and admin login page
+        run: |
+          curl --fail --silent http://localhost:3000/api/health
+          curl --fail --silent --output /dev/null http://localhost:3000/
+          curl --fail --silent --output /dev/null http://localhost:3000/admin/login
+
+      - name: Check the demo login is printed in the logs
+        run: |
+          docker compose logs app | grep "Password: demo-password"
+
+      - name: Restart keeps data and skips the seed
+        run: |
+          docker compose restart app
+          docker compose up --wait --wait-timeout 120
+          docker compose logs app | grep "Database already seeded, skipping."
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Tear down
+        if: always()
+        run: docker compose down --volumes
