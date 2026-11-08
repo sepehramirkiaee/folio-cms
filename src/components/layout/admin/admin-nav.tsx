@@ -2,19 +2,41 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Suspense } from "react";
 import { cn } from "@/lib/utils";
 import { adminNavItems } from "./nav-items";
 
 type AdminNavProps = { collapsed?: boolean; onNavigate?: () => void };
 
-export function AdminNav({ collapsed = false, onNavigate }: AdminNavProps) {
-  const pathname = usePathname();
+/**
+ * The active link depends on the URL, which is request data under Cache
+ * Components. The Suspense fallback renders the same links without the
+ * active state, so the nav is in the static shell.
+ */
+export function AdminNav(props: AdminNavProps) {
+  return (
+    <Suspense fallback={<NavLinks {...props} pathname={null} />}>
+      <ActiveNavLinks {...props} />
+    </Suspense>
+  );
+}
 
+function ActiveNavLinks(props: AdminNavProps) {
+  return <NavLinks {...props} pathname={usePathname()} />;
+}
+
+function NavLinks({
+  collapsed = false,
+  onNavigate,
+  pathname,
+}: AdminNavProps & { pathname: string | null }) {
   return (
     <nav aria-label="Admin">
       <ul className="flex flex-col gap-1">
         {adminNavItems.map(({ href, label, icon: Icon }) => {
-          const active = href === "/admin" ? pathname === href : pathname.startsWith(href);
+          const active =
+            pathname !== null &&
+            (href === "/admin" ? pathname === href : pathname.startsWith(href));
           return (
             <li key={href}>
               <Link
