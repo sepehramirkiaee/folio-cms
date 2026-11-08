@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense } from "react";
+import { useDashboardStats } from "@/features/dashboard/hooks/use-dashboard-stats";
 import { cn } from "@/lib/utils";
 import { adminNavItems } from "./nav-items";
 
@@ -33,7 +34,7 @@ function NavLinks({
   return (
     <nav aria-label="Admin">
       <ul className="flex flex-col gap-1">
-        {adminNavItems.map(({ href, label, icon: Icon }) => {
+        {adminNavItems.map(({ href, label, icon: Icon, showUnread }) => {
           const active =
             pathname !== null &&
             (href === "/admin" ? pathname === href : pathname.startsWith(href));
@@ -52,11 +53,28 @@ function NavLinks({
               >
                 <Icon className="size-4 shrink-0" aria-hidden />
                 <span className={cn(collapsed && "sr-only")}>{label}</span>
+                {showUnread && <UnreadCount collapsed={collapsed} />}
               </Link>
             </li>
           );
         })}
       </ul>
     </nav>
+  );
+}
+
+function UnreadCount({ collapsed }: { collapsed: boolean }) {
+  const unread = useDashboardStats().data?.messages.unread ?? 0;
+  if (unread === 0) return null;
+  return (
+    <span
+      className={cn(
+        "rounded-full bg-brand px-1.5 text-xs leading-5 font-semibold text-brand-foreground tabular-nums",
+        collapsed ? "sr-only" : "ml-auto",
+      )}
+    >
+      {unread}
+      <span className="sr-only"> unread</span>
+    </span>
   );
 }
