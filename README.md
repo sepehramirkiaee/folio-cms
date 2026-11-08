@@ -6,8 +6,8 @@ The public site is server-rendered from PostgreSQL for speed and SEO. The
 admin is a protected dashboard for projects, experience, skills and contact
 messages. The whole stack starts with one Docker command.
 
-> Status: Phase 2 of 4. The admin is complete; the public site and demo mode
-> land in Phase 3. See [Roadmap](#roadmap).
+> Status: Phase 3 of 4. The site, admin and demo mode are complete; Phase 4
+> adds end-to-end and accessibility tests. See [Roadmap](#roadmap).
 
 ## Run locally with Docker
 
@@ -50,6 +50,51 @@ npm install
 npm run db:deploy && npm run db:seed
 npm run dev
 ```
+
+## Deploy your own
+
+folio-cms is one Docker image plus PostgreSQL, configured only through
+environment variables. Any host that runs a container works (a VPS with
+Docker Compose, Fly.io, Railway, Render), with any hosted Postgres.
+
+1. Create a PostgreSQL database and note its connection string.
+2. Build the image from this repository (`docker build -t folio-cms .`) or let
+   your host build it from the Dockerfile.
+3. Run it with these variables:
+
+   ```bash
+   DATABASE_URL="postgresql://user:password@host:5432/folio"
+   AUTH_SECRET="$(openssl rand -base64 32)"
+   AUTH_URL="https://your-domain.com"
+   ADMIN_EMAIL="you@example.com"        # first-start admin account
+   ADMIN_PASSWORD="a-long-password"
+   ```
+
+4. On start the container applies migrations, creates the admin account and
+   demo content if the database is empty, and serves on port 3000. Put it
+   behind your host's HTTPS proxy.
+
+To use the bundled `docker-compose.yml` on a server, set the same variables in
+a `.env` file next to it and run `docker compose up -d --build`.
+
+### Running a public demo
+
+Set `DEMO_MODE=true` to turn a deployment into a public demo:
+
+- A banner on every page says it is a demo that resets nightly.
+- The sign-in page shows and prefills the demo login.
+- Each table has a row limit, so visitors cannot flood the shared demo.
+- The contact form warns that messages are visible to other demo visitors.
+
+Reset the content every night with a cron job on the host:
+
+```cron
+# Every day at 03:00, wipe and reseed the demo content
+0 3 * * * cd /srv/folio-cms && docker compose exec -T app node scripts/reset-demo.ts
+```
+
+Outside Docker the same reset is `npm run db:reset-demo`. Both refuse to run
+unless `DEMO_MODE=true`, so they cannot wipe a real portfolio by accident.
 
 ## Configuration
 
@@ -125,7 +170,7 @@ A few choices worth explaining:
 
 - [x] Phase 1: tooling, CI, Docker, database schema and seed, admin login
 - [x] Phase 2: admin CRUD for projects, experience and skills, reorder, inbox, dashboard
-- [ ] Phase 3: public site, contact form, demo mode
+- [x] Phase 3: public site, contact form, demo mode
 - [ ] Phase 4: e2e and accessibility tests, docs polish
 
 ## How this was built
