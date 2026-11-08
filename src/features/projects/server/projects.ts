@@ -3,6 +3,7 @@ import type { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import { ApiError } from "@/lib/api/errors";
 import { paginate } from "@/lib/api/list-params";
+import { assertSkillsExist } from "@/features/skills/server/skills";
 import { getDb } from "@/lib/db";
 import { slugify } from "@/lib/slug";
 import type {
@@ -170,16 +171,6 @@ export async function reorderProjects(ids: string[]): Promise<ProjectOrderItem[]
     ids.map((id, index) => db.project.update({ where: { id }, data: { sortOrder: index } })),
   );
   return listProjectOrder();
-}
-
-async function assertSkillsExist(skillIds: string[]) {
-  if (skillIds.length === 0) return;
-  const count = await getDb().skill.count({ where: { id: { in: skillIds } } });
-  if (count !== new Set(skillIds).size) {
-    throw new ApiError("VALIDATION_ERROR", "Some skills no longer exist", {
-      skillIds: ["Some selected skills no longer exist. Refresh and pick again."],
-    });
-  }
 }
 
 async function withSlugConflict<T>(fn: () => Promise<T>): Promise<T> {

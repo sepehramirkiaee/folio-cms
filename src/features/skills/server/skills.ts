@@ -85,6 +85,17 @@ export async function deleteSkill(id: string): Promise<void> {
   await getDb().skill.delete({ where: { id } });
 }
 
+/** Rejects skill ids that do not exist, as a field error on the skill picker. */
+export async function assertSkillsExist(skillIds: string[]): Promise<void> {
+  if (skillIds.length === 0) return;
+  const count = await getDb().skill.count({ where: { id: { in: skillIds } } });
+  if (count !== new Set(skillIds).size) {
+    throw new ApiError("VALIDATION_ERROR", "Some skills no longer exist", {
+      skillIds: ["Some selected skills no longer exist. Refresh and pick again."],
+    });
+  }
+}
+
 /**
  * The slug is derived from the name, so a slug clash ("Next.js" and "NextJS")
  * is reported on the name field, where the user can fix it.
