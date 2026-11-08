@@ -301,6 +301,11 @@ started.
 Every commit was checked on its own (types and formatting) before pushing, so
 the history can be bisected.
 
+One example of the process paying off: the end-to-end suite caught that the
+login form, if submitted before its JavaScript loaded, fell back to a native
+GET request and put the password in the URL. The fix and a regression test are
+in `fix(security): keep credentials out of the URL before hydration`.
+
 ## Nice to have, not built
 
 - Markdown or rich text for case studies (currently plain text paragraphs)
