@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowDown, ArrowUp, Plus, X } from "lucide-react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import type { FieldError as RhfFieldError, Merge } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,14 @@ type HighlightsEditorProps = {
  */
 export function HighlightsEditor({ value, onChange, errors, max = 10 }: HighlightsEditorProps) {
   const listRef = useRef<HTMLOListElement>(null);
+  const focusNew = useRef(false);
+
+  // Focus the input that was just added, once it exists in the DOM.
+  useEffect(() => {
+    if (!focusNew.current) return;
+    focusNew.current = false;
+    listRef.current?.querySelector<HTMLInputElement>("li:last-child input")?.focus();
+  }, [value.length]);
 
   const update = (index: number, text: string) =>
     onChange(value.map((v, i) => (i === index ? text : v)));
@@ -30,10 +38,8 @@ export function HighlightsEditor({ value, onChange, errors, max = 10 }: Highligh
     onChange(next);
   };
   const add = () => {
+    focusNew.current = true;
     onChange([...value, ""]);
-    requestAnimationFrame(() =>
-      listRef.current?.querySelector<HTMLInputElement>("li:last-child input")?.focus(),
-    );
   };
 
   return (
