@@ -71,7 +71,11 @@ function TabsContent({ className, ...props }: React.ComponentProps<typeof TabsPr
   return (
     <TabsPrimitive.Content
       data-slot="tabs-content"
-      className={cn("flex-1 outline-none", className)}
+      // Radix makes the panel focusable; show where focus is (WCAG 2.4.7).
+      className={cn(
+        "flex-1 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        className,
+      )}
       {...props}
     />
   );
