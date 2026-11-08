@@ -27,7 +27,7 @@ export function InputField({
   error,
   registration,
   ...inputProps
-}: BaseProps & Omit<ComponentProps<typeof Input>, "id" | keyof UseFormRegisterReturn>) {
+}: BaseProps & Omit<ComponentProps<typeof Input>, "id" | "name" | "onChange" | "onBlur" | "ref">) {
   return (
     <Field data-invalid={Boolean(error)}>
       <FieldLabel htmlFor={id}>{label}</FieldLabel>
@@ -51,7 +51,8 @@ export function TextareaField({
   error,
   registration,
   ...textareaProps
-}: BaseProps & Omit<ComponentProps<typeof Textarea>, "id" | keyof UseFormRegisterReturn>) {
+}: BaseProps &
+  Omit<ComponentProps<typeof Textarea>, "id" | "name" | "onChange" | "onBlur" | "ref">) {
   return (
     <Field data-invalid={Boolean(error)}>
       <FieldLabel htmlFor={id}>{label}</FieldLabel>
